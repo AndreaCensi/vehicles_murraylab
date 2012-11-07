@@ -1,0 +1,17 @@
+<package>
+  <description brief="landroid_murraylab">
+
+     landroid_murraylab -- plumbing for the LANdroid robots in Murray's lab.
+
+  </description>
+  <author>Scott C. Livingston and others</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+
+</package>
+
+
