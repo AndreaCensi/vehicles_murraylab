@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """
 Extract several calibration parameters obtained using J.-Y. Bouguet's
-Camera Calibration Toolbox for Matlab and save them into a NumPy NPZ file.
+Camera Calibration Toolbox for Matlab
+(http://vision.caltech.edu/bouguetj/calib_doc/)
+and save them into a NumPy NPZ file.
 
 SCL; 13 Nov 2012.
 """
