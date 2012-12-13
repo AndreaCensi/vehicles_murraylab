@@ -1,0 +1,17 @@
+<package>
+  <description brief="landroid_skeleton">
+
+     landroid_skeleton
+
+  </description>
+  <author>Scott Livingston</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/landroid_skeleton</url>
+  <depend package="landroid_murraylab"/>
+  <depend package="sensor_msgs"/>
+  <depend package="rospy"/>
+
+</package>
+
+
