@@ -1,0 +1,16 @@
+<launch>
+  <!-- machine address assumes /etc/hosts is properly configured -->
+  <machine name="LDR13" address="ldr13" default="never"
+   user="root"
+   ros-root="/opt/gumros/diamondback/ros"
+   ros-package-path="/opt/gumros/diamondback/laser_drivers/hokuyo_node:/opt/gumros/diamondback/common:/opt/gumros/diamondback/common_msgs:/opt/gumros/diamondback/driver_common:/opt/gumros/diamondback/diagnostics_monitors:/opt/gumros/diamondback/diagnostics:/opt/gumros/diamondback/eros:/opt/gumros/diamondback/ros_comm:/home/root/landroid_murraylab">
+    <!-- bentobox.cds has address 172.20.0.100 on the ad-hoc wireless network "LDR" -->
+    <env name="ROS_MASTER_URI" value="http://172.20.0.100:11311" />
+  </machine>
+
+  <machine name="bentobox" address="localhost" default="true" />
+
+  <node machine="LDR13" launch-prefix="/usr/bin/python" pkg="landroid_murraylab" cwd="node" name="hokuyod_client_node" type="hokuyo.py" output="screen" />
+  <node machine="LDR13" launch-prefix="/usr/bin/python" pkg="landroid_murraylab" name="ldr_tracks" type="tracks.py" output="screen" />
+  <node machine="bentobox" pkg="trackem_ros" name="trackem" type="forwardcal.py" args="/home/scott/work/trackem/contrib/trackem_ros/calibrations/camcalibration-20121206-142756.npz" />
+</launch>
