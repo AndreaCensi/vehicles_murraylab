@@ -3,13 +3,17 @@
 Find physical coordinates of a given point using a calibration as
 recognized by trackem_ros.  Invocation is of the form
 
-  $ ./overhead-interactive.py animal.png house.npz
+  $ ./overhead-interactive.py animal.png house.npz [FILE]
 
 where animal.png is an image from the overhead camera and house.npz is
-a calibration file suitable for use by the forwardcal.py node of trackem_ros.
+a calibration file suitable for use by the forwardcal.py node of
+trackem_ros.  FILE is the name of a plaintext file to which the list
+of points clicked should be saved in a format that can be read by the
+function numpy.loadtxt().  If no FILE is specified, then no such list
+is saved to disk.
 
 
-SCL; 5 Jan 2013.
+SCL; 7 Jan 2013.
 """
 
 import sys
@@ -69,7 +73,7 @@ def pixel2m(x_p, f, pp, kc, H):
 ############################################################
 ## Execution begins here
 if len(sys.argv) < 3:
-    print "Usage: %s FILE.png FILE.npz" % sys.argv[0]
+    print "Usage: %s FILE.png FILE.npz [FILE.txt]" % sys.argv[0]
     exit(1)
 
 I = mpimg.imread(sys.argv[1])
@@ -80,12 +84,15 @@ cc = cal_data["cc"]
 kc = cal_data["kc"]
 H = cal_data["H"]
 
+points_clicked = []
+
 
 def onclick(event):
     if event.xdata is None or event.ydata is None:
         return
-    print pixel2m((event.xdata, event.ydata),
-                  f=fc, pp=cc, kc=kc, H=H)[:2]
+    points_clicked.append(pixel2m((event.xdata, event.ydata),
+                                  f=fc, pp=cc, kc=kc, H=H)[:2])
+    print points_clicked[-1]
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -93,3 +100,9 @@ ax.imshow(I)
 cid = fig.canvas.mpl_connect("button_press_event", onclick)
 
 plt.show()
+
+# Save list to disk if requested
+if len(sys.argv) >= 4:
+    print "Saving points that were clicked to "+sys.argv[3]+"..."
+    with open(sys.argv[3], "w") as f:
+        f.write("\n".join([str(x[0])+" "+str(x[1]) for x in points_clicked])+"\n")
