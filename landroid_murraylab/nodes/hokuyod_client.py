@@ -100,11 +100,11 @@ class HokuyoMux(Thread):
                         'min_dist': t[7],
                         'max_dist': t[8],
                         'CRC': t[9]}
-            if not self.ts:
-               self.ts = t[1]
-               self.ts_local = time.time()*1000
-            localt = self.ts + time.time()*1000 - self.ts_local
-            deltat = localt - t[1]
+            now = time.time()
+            if self.ts is None:
+               self.ts = now
+            deltat = now - self.ts
+            self.ts = now
             if deltat > latency:
                continue
             string = ''
