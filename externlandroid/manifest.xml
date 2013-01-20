@@ -1,0 +1,17 @@
+<package>
+  <description brief="externlandroid">
+
+     externlandroid -- handy tools for use offboard of the LANdroid robots in Murray's lab.
+
+  </description>
+  <author>Scott C. Livingston</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+
+  <depend package="rospy"/>
+  <depend package="sensor_msgs"/>
+  <depend package="nav_msgs"/>
+  <depend package="landroid_murraylab"/>
+  <depend package="trackem_ros"/>
+
+</package>
