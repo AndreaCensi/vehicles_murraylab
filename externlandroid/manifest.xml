@@ -9,6 +9,7 @@
   <review status="unreviewed" notes=""/>
 
   <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="nav_msgs"/>
   <depend package="landroid_murraylab"/>

@@ -4,7 +4,7 @@ Present data streamed from Landroid, available in messages provided
 through the landroid_murraylab package, in more common ROS types.
 
 
-SCL; 19 Jan 2013.
+SCL; 20 Jan 2013.
 """
 
 import roslib; roslib.load_manifest("externlandroid")
@@ -12,11 +12,33 @@ import rospy
 import tf
 from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import Twist
 from trackem_ros.msg import MTCalPoints
 from landroid_murraylab.msg import ldr_tracks
-
 import numpy as np
 import numpy.linalg as la
+
+
+class TrackForward(rospy.Publisher):
+    def __init__(self, name):
+        self.left_speed = 0
+        self.right_speed = 0
+        self.factor = 50  # Linear approximation to unit conversion
+        rospy.Publisher.__init__(self, name, ldr_tracks)
+
+    def __call__(self, data):
+        # Only support nonzero "linear x" and "angular z" velocities.
+        self.left_speed = self.factor*data.linear.x
+        self.right_speed = self.factor*data.linear.x
+        diff = self.factor*data.angular.z
+        self.left_speed -= diff
+        self.right_speed += diff
+        self.publish(ldr_tracks(left=int(self.left_speed),
+                                right=int(self.right_speed)))
+
+    def spin(self):
+        self.publish(ldr_tracks(left=int(self.left_speed),
+                                right=int(self.right_speed)))
 
 
 class PoseForward(rospy.Publisher):
@@ -89,6 +111,8 @@ class LaserForward(rospy.Publisher):
         data.header.stamp.secs = now.secs
         data.header.stamp.nsecs = now.nsecs
         data.header.frame_id = "scanner0"
+        data.time_increment = 0.0
+        data.scan_time = 0.0
         self.br.sendTransform((.1, 0, 0),
                               tf.transformations.quaternion_from_euler(0.,0.,0.),
                               now, "scanner0", "base_link")
@@ -101,4 +125,10 @@ if __name__ == "__main__":
     psub = rospy.Subscriber("/trackem/calpoints", MTCalPoints, callback=ppub)
     lpub = LaserForward("~base_scan")
     lsub = rospy.Subscriber("/hokuyod_client_node/scan", LaserScan, callback=lpub)
-    rospy.spin()
+    tpub = TrackForward("/track_input")
+    tsub = rospy.Subscriber("~cmd_vel", Twist, callback=tpub)
+
+    rate = rospy.Rate(5.)
+    while not rospy.is_shutdown():
+        tpub.spin()
+        rate.sleep()
