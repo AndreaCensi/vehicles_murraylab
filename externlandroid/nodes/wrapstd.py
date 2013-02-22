@@ -3,8 +3,11 @@
 Present data streamed from Landroid, available in messages provided
 through the landroid_murraylab package, in more common ROS types.
 
+Twist message linear velocities are in units of meters/second, and
+rotational units are radians/second.
 
-SCL; 20 Jan 2013.
+
+SCL; 21 Feb 2013.
 """
 
 import roslib; roslib.load_manifest("externlandroid")
@@ -23,14 +26,14 @@ class TrackForward(rospy.Publisher):
     def __init__(self, name):
         self.left_speed = 0
         self.right_speed = 0
-        self.factor = 50  # Linear approximation to unit conversion
+        self.factor = 380  # Linear approximation to unit conversion
         rospy.Publisher.__init__(self, name, ldr_tracks)
 
     def __call__(self, data):
         # Only support nonzero "linear x" and "angular z" velocities.
         self.left_speed = self.factor*data.linear.x
         self.right_speed = self.factor*data.linear.x
-        diff = self.factor*data.angular.z
+        diff = (self.factor/9.)*data.angular.z
         self.left_speed -= diff
         self.right_speed += diff
         self.publish(ldr_tracks(left=int(self.left_speed),
@@ -130,5 +133,5 @@ if __name__ == "__main__":
 
     rate = rospy.Rate(5.)
     while not rospy.is_shutdown():
-        tpub.spin()
+        # tpub.spin()
         rate.sleep()
