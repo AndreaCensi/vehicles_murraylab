@@ -26,14 +26,14 @@ class TrackForward(rospy.Publisher):
     def __init__(self, name):
         self.left_speed = 0
         self.right_speed = 0
-        self.factor = 380  # Linear approximation to unit conversion
+        self.factor = 342  # Linear approximation to unit conversion
         rospy.Publisher.__init__(self, name, ldr_tracks)
 
     def __call__(self, data):
         # Only support nonzero "linear x" and "angular z" velocities.
         self.left_speed = self.factor*data.linear.x
         self.right_speed = self.factor*data.linear.x
-        diff = (self.factor/9.)*data.angular.z
+        diff = (self.factor/8.)*data.angular.z
         self.left_speed -= diff
         self.right_speed += diff
         self.publish(ldr_tracks(left=int(self.left_speed),
@@ -66,6 +66,9 @@ class PoseForward(rospy.Publisher):
             self.br.sendTransform((self.x, self.y, 0),
                                   tf.transformations.quaternion_from_euler(0., 0., self.theta),
                                   now, "base_link", "world")
+            self.br.sendTransform((0., 0., 0.),
+                                  tf.transformations.quaternion_from_euler(0., 0., 0.),
+                                  now, "world", "odom")
             self.publish(fdata)
             
 
